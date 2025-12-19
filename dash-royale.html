@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Dash Royale</title>
+<style>
+body{
+  margin:0;
+  font-family:Arial;
+  background:#0f1220;
+  color:#fff;
+  text-align:center;
+}
+h1{margin:8px}
+
+#arena{
+  width:360px;
+  height:520px;
+  background:linear-gradient(#2a2f5a,#1b1f3b);
+  margin:10px auto;
+  position:relative;
+  border-radius:14px;
+  overflow:hidden;
+  border:3px solid #444;
+}
+
+.lane{
+  position:absolute;
+  width:100%;
+  height:33.33%;
+  border-top:1px solid #333;
+}
+
+.tower{
+  position:absolute;
+  width:60px;
+  height:60px;
+  border-radius:10px;
+  line-height:14px;
+  font-size:12px;
+  padding-top:8px;
+  font-weight:bold;
+}
+.enemyTower{top:8px;background:#e74c3c}
+.playerTower{bottom:8px;background:#3498db}
+
+.unit{
+  position:absolute;
+  width:28px;
+  height:28px;
+  border-radius:50%;
+  background:#2ecc71;
+}
+.enemy{background:#f1c40f}
+
+#ui{
+  max-width:360px;
+  margin:auto;
+  display:flex;
+  justify-content:space-between;
+  padding:8px;
+}
+button,a{
+  padding:10px 14px;
+  background:#2575fc;
+  border:none;
+  border-radius:8px;
+  color:#fff;
+  text-decoration:none;
+  cursor:pointer;
+}
+#msg{font-size:20px;margin:10px}
+</style>
+</head>
+<body>
+
+<h1>⚔️ Dash Royale</h1>
+<div>Elixir: <b><span id="elixir">5</span></b></div>
+
+<div id="arena">
+  <div class="lane" style="top:0%" onclick="deploy(0)"></div>
+  <div class="lane" style="top:33.33%" onclick="deploy(1)"></div>
+  <div class="lane" style="top:66.66%" onclick="deploy(2)"></div>
+
+  <div class="tower enemyTower" style="left:20px">
+    EN<br>HP <span id="e1">200</span>
+  </div>
+  <div class="tower enemyTower" style="right:20px">
+    EN<br>HP <span id="e2">200</span>
+  </div>
+
+  <div class="tower playerTower" style="left:20px">
+    YOU<br>HP <span id="p1">200</span>
+  </div>
+  <div class="tower playerTower" style="right:20px">
+    YOU<br>HP <span id="p2">200</span>
+  </div>
+</div>
+
+<div id="ui">
+  <button onclick="reset()">Restart</button>
+  <a href="index.html">Menu</a>
+</div>
+
+<div id="msg"></div>
+
+<script>
+let arena=document.getElementById("arena");
+let elixir=5;
+let units=[];
+let gameOver=false;
+
+let towers={
+  p:[200,200],
+  e:[200,200]
+};
+
+const elixirEl=document.getElementById("elixir");
+
+setInterval(()=>{
+  if(elixir<10 && !gameOver){
+    elixir++;
+    elixirEl.textContent=elixir;
+  }
+},2000);
+
+function deploy(lane){
+  if(elixir<3 || gameOver) return;
+  elixir-=3;
+  elixirEl.textContent=elixir;
+
+  spawnUnit(false,lane);
+}
+
+function spawnUnit(enemy,lane){
+  let u=document.createElement("div");
+  u.className="unit"+(enemy?" enemy":"");
+  u.style.left="166px";
+  let y=enemy?80:420;
+  u.style.top=y+"px";
+  arena.appendChild(u);
+
+  units.push({el:u,y,enemy,lane,hp:30});
+}
+
+setInterval(()=>{
+  if(!gameOver){
+    spawnUnit(true,Math.floor(Math.random()*3));
+  }
+},3000);
+
+function updateTowers(){
+  document.getElementById("p1").textContent=towers.p[0];
+  document.getElementById("p2").textContent=towers.p[1];
+  document.getElementById("e1").textContent=towers.e[0];
+  document.getElementById("e2").textContent=towers.e[1];
+}
+
+function checkWin(){
+  if(towers.e[0]<=0 && towers.e[1]<=0){
+    endGame("🏆 YOU WIN!");
+  }
+  if(towers.p[0]<=0 && towers.p[1]<=0){
+    endGame("💀 YOU LOSE");
+  }
+}
+
+function endGame(text){
+  gameOver=true;
+  document.getElementById("msg").textContent=text;
+}
+
+function loop(){
+  units.forEach((u,i)=>{
+    u.y += u.enemy ? 1.2 : -1.2;
+    u.el.style.top=u.y+"px";
+
+    if(!u.enemy && u.y<90){
+      towers.e[Math.random()>0.5?0:1]-=20;
+      arena.removeChild(u.el);
+      units.splice(i,1);
+      updateTowers();
+      checkWin();
+    }
+
+    if(u.enemy && u.y>430){
+      towers.p[Math.random()>0.5?0:1]-=20;
+      arena.removeChild(u.el);
+      units.splice(i,1);
+      updateTowers();
+      checkWin();
+    }
+  });
+  requestAnimationFrame(loop);
+}
+loop();
+
+function reset(){
+  units.forEach(u=>arena.removeChild(u.el));
+  units=[];
+  elixir=5;
+  towers={p:[200,200],e:[200,200]};
+  gameOver=false;
+  document.getElementById("msg").textContent="";
+  updateTowers();
+  elixirEl.textContent=elixir;
+}
+</script>
+
+</body>
+</html>
