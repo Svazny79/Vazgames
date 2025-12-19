@@ -16,71 +16,36 @@
       text-align: center;
       background: linear-gradient(135deg, #6a11cb, #2575fc);
     }
-    header h1 { margin: 0; }
-
     .container {
-      padding: 20px;
-      max-width: 1100px;
+      max-width: 1000px;
       margin: auto;
-    }
-
-    .games {
+      padding: 30px;
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
       gap: 20px;
     }
-
     .card {
       background: #1b1f3b;
-      border-radius: 12px;
-      padding: 20px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+      padding: 25px;
+      border-radius: 14px;
+      text-align: center;
+      box-shadow: 0 10px 25px rgba(0,0,0,.3);
     }
-
-    .card h2 { margin-top: 0; }
-
-    button {
+    a {
+      display: inline-block;
+      margin-top: 15px;
+      padding: 10px 18px;
       background: #2575fc;
-      border: none;
-      padding: 10px 16px;
-      border-radius: 8px;
       color: #fff;
-      cursor: pointer;
-      font-size: 14px;
+      text-decoration: none;
+      border-radius: 8px;
     }
-    button:hover { opacity: 0.85; }
-
-    /* Tic Tac Toe */
-    .board {
-      display: grid;
-      grid-template-columns: repeat(3, 70px);
-      grid-template-rows: repeat(3, 70px);
-      gap: 5px;
-      margin-top: 10px;
-    }
-    .cell {
-      background: #2a2f5a;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 28px;
-      cursor: pointer;
-      border-radius: 6px;
-    }
-
-    /* Clicker */
-    .score {
-      font-size: 22px;
-      margin: 10px 0;
-    }
-
+    a:hover { opacity: .85; }
     footer {
       text-align: center;
       padding: 15px;
-      background: #0b0e1a;
-      margin-top: 40px;
-      font-size: 14px;
       color: #aaa;
+      background: #0b0e1a;
     }
   </style>
 </head>
@@ -88,98 +53,26 @@
 
 <header>
   <h1>🎮 GameZone</h1>
-  <p>Play simple games right in your browser</p>
+  <p>Select a game</p>
 </header>
 
 <div class="container">
-  <div class="games">
+  <div class="card">
+    <h2>Tic Tac Toe</h2>
+    <p>Classic X vs O</p>
+    <a href="tic-tac-toe.html">Play</a>
+  </div>
 
-    <!-- Tic Tac Toe -->
-    <div class="card">
-      <h2>Tic Tac Toe</h2>
-      <p id="status">Player X's turn</p>
-      <div class="board" id="board"></div>
-      <br />
-      <button onclick="resetGame()">Restart</button>
-    </div>
-
-    <!-- Clicker Game -->
-    <div class="card">
-      <h2>Clicker Game</h2>
-      <p>Click the button as many times as you can.</p>
-      <div class="score">Score: <span id="score">0</span></div>
-      <button onclick="addPoint()">Click Me!</button>
-      <button onclick="resetScore()" style="margin-left:10px;">Reset</button>
-    </div>
-
+  <div class="card">
+    <h2>Clicker Game</h2>
+    <p>Click as fast as you can</p>
+    <a href="clicker.html">Play</a>
   </div>
 </div>
 
 <footer>
-  © 2025 GameZone | Built with HTML, CSS & JavaScript
+  © 2025 GameZone
 </footer>
-
-<script>
-  /* Tic Tac Toe Logic */
-  const board = document.getElementById('board');
-  const statusText = document.getElementById('status');
-  let currentPlayer = 'X';
-  let cells = Array(9).fill(null);
-
-  function createBoard() {
-    board.innerHTML = '';
-    cells.forEach((cell, index) => {
-      const div = document.createElement('div');
-      div.className = 'cell';
-      div.textContent = cell || '';
-      div.onclick = () => makeMove(index);
-      board.appendChild(div);
-    });
-  }
-
-  function makeMove(index) {
-    if (cells[index] || checkWinner()) return;
-    cells[index] = currentPlayer;
-    if (checkWinner()) {
-      statusText.textContent = `Player ${currentPlayer} wins!`;
-    } else if (cells.every(c => c)) {
-      statusText.textContent = "It's a draw!";
-    } else {
-      currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
-      statusText.textContent = `Player ${currentPlayer}'s turn`;
-    }
-    createBoard();
-  }
-
-  function checkWinner() {
-    const wins = [
-      [0,1,2],[3,4,5],[6,7,8],
-      [0,3,6],[1,4,7],[2,5,8],
-      [0,4,8],[2,4,6]
-    ];
-    return wins.some(([a,b,c]) => cells[a] && cells[a] === cells[b] && cells[a] === cells[c]);
-  }
-
-  function resetGame() {
-    cells = Array(9).fill(null);
-    currentPlayer = 'X';
-    statusText.textContent = "Player X's turn";
-    createBoard();
-  }
-
-  createBoard();
-
-  /* Clicker Game */
-  let score = 0;
-  function addPoint() {
-    score++;
-    document.getElementById('score').textContent = score;
-  }
-  function resetScore() {
-    score = 0;
-    document.getElementById('score').textContent = score;
-  }
-</script>
 
 </body>
 </html>
